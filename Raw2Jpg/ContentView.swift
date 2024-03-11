@@ -4,32 +4,43 @@ struct ContentView: View {
     @StateObject private var settingsViewModel = SettingsViewModel()
     @State private var isShowingSettings = false
     @State private var selectedFolder: URL?
-    @State private var sourceFolder:String?
-    @State private var destinationFolder:String?
-    
+
     var body: some View {
         VStack {
-            Button("Copy Images") {
-                copyImages()
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            
-            Button("Configure Folders") {
-                isShowingSettings = true
-            }
-            .padding()
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .sheet(isPresented: $isShowingSettings) {
+            HStack {
+                Button("Copy Images") {
+                    copyImages()
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+
+                Button("Configure Folders") {
+                    isShowingSettings = true
+                }
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .sheet(isPresented: $isShowingSettings) {
                     SettingsView(settingsViewModel: settingsViewModel, isShowingSettings: $isShowingSettings)
                 }
+            }
+            .padding()
+
+            if let imageList = settingsViewModel.imageList {
+                List(imageList, id: \.self) { imageName in
+                    Text(imageName)
+                }
+                .padding()
+            } else {
+                Text("No images available.")
+                    .padding()
+            }
         }
     }
-    
+
     private func copyImages() {
         let sourceFolder = URL(fileURLWithPath: settingsViewModel.sourceFolder)
         let destinationFolder = URL(fileURLWithPath: settingsViewModel.destinationFolder)
@@ -40,7 +51,7 @@ struct ContentView: View {
         DispatchQueue.global(qos: .background).async {
             do {
                 let sdCardContents = try fileManager.contentsOfDirectory(atPath: sourceFolder.path)
-                
+
                 for file in sdCardContents {
                     let sdCardFilePath = sourceFolder.appendingPathComponent(file)
                     do {

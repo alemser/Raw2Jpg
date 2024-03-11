@@ -4,6 +4,7 @@ import Combine
 class SettingsViewModel: ObservableObject {
     @Published var sourceFolder: String = ""
     @Published var destinationFolder: String = ""
+    @Published var imageList: [String] = []
 
     var cancellables: Set<AnyCancellable> = []
 

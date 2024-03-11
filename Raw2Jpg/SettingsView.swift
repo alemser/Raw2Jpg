@@ -86,7 +86,18 @@ struct SettingsView: View {
         if !settingsViewModel.sourceFolder.isEmpty && !settingsViewModel.destinationFolder.isEmpty {
             UserDefaults.standard.set(settingsViewModel.sourceFolder, forKey: "SourceFolder")
             UserDefaults.standard.set(URL(fileURLWithPath: settingsViewModel.destinationFolder), forKey: "DestinationFolder")
-            isShowingSettings = false // Close the SettingsView
+            
+            let fileManager = FileManager.default
+            do {
+                let sdCardContents = try fileManager.contentsOfDirectory(atPath: settingsViewModel.sourceFolder)
+                
+                DispatchQueue.main.async {
+                    settingsViewModel.imageList = sdCardContents
+                }
+            } catch {
+                print("Error while listing images: \(error.localizedDescription)")
+            }
+            isShowingSettings = false
         }
     }
 }
